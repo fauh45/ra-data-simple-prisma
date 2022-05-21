@@ -1,4 +1,5 @@
 import { DeleteRequest, Response } from "./Http";
+import isStringNumber from "./lib/isStringNumber";
 
 export type DeleteOptions = {
   softDeleteField?: string;
@@ -14,13 +15,21 @@ export const deleteHandler = async <
 ) => {
   const deleted = options?.softDeleteField
     ? await table.update({
-        where: { id: +req.body.params.id },
+        where: {
+          id: isStringNumber(req.body.params.id)
+            ? +req.body.params.id
+            : req.body.params.id,
+        },
         data: {
           [options?.softDeleteField]: new Date(),
         },
       })
     : await table.delete({
-        where: { id: +req.body.params.id },
+        where: {
+          id: isStringNumber(req.body.params.id)
+            ? +req.body.params.id
+            : req.body.params.id,
+        },
       });
 
   return res.json({ data: deleted });

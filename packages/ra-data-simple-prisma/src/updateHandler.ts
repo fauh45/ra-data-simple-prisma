@@ -1,5 +1,6 @@
 import { Response, UpdateRequest } from "./Http";
 import { isObject } from "./lib/isObject";
+import isStringNumber from "./lib/isStringNumber";
 
 export type UpdateOptions = {
   skipFields?: string[]; //i.e. Json fields throw error if null is used in update, they would expect {} instead
@@ -28,7 +29,11 @@ export const updateHandler = async <T extends { update: Function }>(
   );
 
   const updated = await table.update({
-    where: { id: +req.body.params.id },
+    where: {
+      id: isStringNumber(req.body.params.id)
+        ? +req.body.params.id
+        : req.body.params.id,
+    },
     data,
   });
 

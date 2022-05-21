@@ -1,4 +1,5 @@
 import { GetOneRequest, Response } from "./Http";
+import isStringNumber from "./lib/isStringNumber";
 
 export const getOneHandler = async <
   W extends {
@@ -17,7 +18,11 @@ export const getOneHandler = async <
   }
 ) => {
   const row = await table.findUnique({
-    where: { id: +req.body.params.id },
+    where: {
+      id: isStringNumber(req.body.params.id)
+        ? +req.body.params.id
+        : req.body.params.id,
+    },
     select: options?.select ?? undefined,
     include: options?.include ?? undefined,
   });
